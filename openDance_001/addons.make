@@ -1,0 +1,7 @@
+ofxNetwork
+ofxOsc
+ofxXmlSettings
+ofxDuration
+ofxLibwebsockets
+ofxRange
+ofxUI
