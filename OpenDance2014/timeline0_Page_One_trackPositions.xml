@@ -1,0 +1,32 @@
+<positions>
+    <element name="audio">
+        <x>0.000000000</x>
+        <y>142.000000000</y>
+        <width>1208.000000000</width>
+        <height>202.000000000</height>
+    </element>
+    <element name="color">
+        <x>0.000000000</x>
+        <y>819.000000000</y>
+        <width>1650.000000000</width>
+        <height>40.000000000</height>
+    </element>
+    <element name="colors">
+        <x>0.000000000</x>
+        <y>368.000000000</y>
+        <width>1208.000000000</width>
+        <height>169.000000000</height>
+    </element>
+    <element name="curves">
+        <x>0.000000000</x>
+        <y>561.000000000</y>
+        <width>1208.000000000</width>
+        <height>185.000000000</height>
+    </element>
+    <element name="curves_0">
+        <x>0.000000000</x>
+        <y>770.000000000</y>
+        <width>1208.000000000</width>
+        <height>187.000000000</height>
+    </element>
+</positions>

@@ -1,0 +1,62 @@
+<tracks>
+    <page>
+        <name>Page One</name>
+        <track>
+            <type>Colors</type>
+            <xmlFileName>colors_.xml</xmlFileName>
+            <trackName>colors</trackName>
+            <displayName>color</displayName>
+            <sendOSC>1</sendOSC>
+            <receiveOSC>0</receiveOSC>
+            <palette>GUI/defaultColorPalette.png</palette>
+        </track>
+        <track>
+            <type>Curves</type>
+            <xmlFileName>curves_.xml</xmlFileName>
+            <trackName>curves</trackName>
+            <displayName>brightness</displayName>
+            <sendOSC>1</sendOSC>
+            <receiveOSC>1</receiveOSC>
+            <min>0.000000000</min>
+            <max>255.000000000</max>
+        </track>
+        <track>
+            <type>Curves</type>
+            <xmlFileName>curves_0_.xml</xmlFileName>
+            <trackName>curves_0</trackName>
+            <displayName>saturate</displayName>
+            <sendOSC>1</sendOSC>
+            <receiveOSC>1</receiveOSC>
+            <min>0.000000000</min>
+            <max>255.999908447</max>
+        </track>
+        <track>
+            <type>Audio</type>
+            <xmlFileName></xmlFileName>
+            <trackName>audio</trackName>
+            <displayName>audio</displayName>
+            <sendOSC>1</sendOSC>
+            <receiveOSC>0</receiveOSC>
+            <clip>/Users/james/Downloads/remusicforopendancemarch/opendance_james_1st_cut_m4a.aif</clip>
+        </track>
+    </page>
+</tracks>
+<timelineSettings>
+    <duration>00:09:23:943</duration>
+    <playhead>00:07:53:883</playhead>
+    <inpoint>00:04:26:436</inpoint>
+    <outpoint>00:09:23:943</outpoint>
+    <loop>1</loop>
+</timelineSettings>
+<projectSettings>
+    <useBPM>1</useBPM>
+    <bpm>110.000000000</bpm>
+    <snapToBPM>1</snapToBPM>
+    <snapToKeys>1</snapToKeys>
+    <oscInEnabled>1</oscInEnabled>
+    <oscOutEnabled>1</oscOutEnabled>
+    <oscInPort>12346</oscInPort>
+    <oscIP>localhost</oscIP>
+    <oscOutPort>12345</oscOutPort>
+    <oscRate>30.000000000</oscRate>
+</projectSettings>
