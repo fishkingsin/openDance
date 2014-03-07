@@ -1,6 +1,8 @@
 #include "testApp.h"
 
 #include <locale>
+float myHue = 0;
+
 bool isNumber(const string& s){
 	locale loc;
 	std::string::const_iterator it = s.begin();
@@ -9,17 +11,26 @@ bool isNumber(const string& s){
 }
 //--------------------------------------------------------------
 void testApp::setup(){
-    
+    spectumRect.set(0, 0, ofGetWidth()*0.5, ofGetHeight());
     spectum.loadImage("images.jpg");
 	ofSetLogLevel(OF_LOG_VERBOSE);
     // setup a server with default options on port 9092
     // - pass in true after port to set up with SSL
+    ofxXmlSettings xmlSettings("settings.xml");
+    if(xmlSettings.pushTag("XML"))
+    {
+        string xmlString;
+        xmlSettings.copyXmlToString(xmlString);
+        ofLogVerbose()<<xmlString;
+    }
     
-    ofxLibwebsockets::ServerOptions options;
+    
+    ofxLibwebsockets::ServerOptions options = ofxLibwebsockets::defaultServerOptions();
+    options.port = 2014;
     options.documentRoot = ofToDataPath("web/");
-    options.port = 9093;
+    options.bUseSSL = false; //ssl not working on Win right now!
     bConnected = server.setup(options);
-
+    
     // Uncomment this to set up a server with a protocol
     // Right now, clients created via libwebsockets that are connecting to servers
     // made via libwebsockets seem to want a protocol. Hopefully this gets fixed,
@@ -68,12 +79,28 @@ void testApp::setup(){
 }
 void testApp::trackUpdated(ofxDurationEventArgs& args){
 	ofLogVerbose("Duration Event") << "track type " << args.track->type << " updated with name " << args.track->name << " and value " << args.track->value << endl;
-    if(args.track->name.find("10.")!=string::npos || args.track->name.find("192.")!=string::npos || args.track->name.find("127.")!=string::npos)
     {
-        toSend = ofToHex(args.track->color.getHex());
-        string targetIP =  args.track->name.substr(1,string::npos);
-        ofLogVerbose("Web Socket Send to IP") <<targetIP;
-        server.send(toSend.substr(2,string::npos-2) ,targetIP);
+        if(args.track->name.find("brightness")!=string::npos)
+        {
+            myBrightness = args.track->value;
+
+        }
+        if(args.track->name.find("saturate")!=string::npos)
+        {
+            mySaturation= args.track->value;
+
+
+        }
+        if(args.track->name.find("color")!=string::npos)
+        {
+            myHue = args.track->color.getHue();
+            //            ofLogVerbose()<<myColor;
+            
+        }
+        
+        
+
+        
     }
 }
 void testApp::exit()
@@ -86,39 +113,31 @@ void testApp::exit()
 }
 //--------------------------------------------------------------
 void testApp::update(){
-	
-#ifdef LED
-	led->renderBuffer.begin();
-#endif
-	ofPushStyle();
-	if(colors.size()>0)
-	{
-		float div = numLED/colors.size();
-		for(int i=0; i < colors.size(); i++)
-		{
-			ofSetColor(colors[i]);
-#ifdef LED
-			ofRect(div*i,0,div,led->renderBuffer.getHeight());
-#endif
-		}
-	}
-	ofPopStyle();
-#ifdef LED
-	led->renderBuffer.end();
-    led->encode();
-	spi.send(led->txBuffer);
-#endif
+
+    myColor.setHue(myHue);
+    myColor.setSaturation(mySaturation);
+    myColor.setBrightness(myBrightness);
+    toSend = ofToHex(myColor.getHex());
+    
+	server.send(toSend.substr(2,string::npos-2) );
+
 }
 
 //--------------------------------------------------------------
 void testApp::draw(){
     
-    spectum.draw(0,0,ofGetWidth(),ofGetHeight());
+//    spectum.draw(spectumRect);
+    
+//    ofPushStyle();
+//    ofSetColor(myColor);
+//    ofRect(0,0,ofGetWidth(),ofGetHeight());
+//    ofPopStyle();
+    
     ofPushStyle();
     ofSetColor(255,255, 255, 125);
-        duration.draw(0,0, ofGetWidth(), ofGetHeight());
+    duration.draw(ofGetWidth()*0.5,0, ofGetWidth()*0.5, ofGetHeight());
     ofPopStyle();
-
+    
     if ( bConnected ){
         ofDrawBitmapString("WebSocket server setup at "+ofToString( server.getPort() ) + ( server.usingSSL() ? " with SSL" : " without SSL"), 20, 20);
         
@@ -148,10 +167,6 @@ void testApp::draw(){
 	
 	ofPushMatrix();
 	ofScale(5, 5);
-#ifdef LED
-    led->renderBuffer.draw(20,10);
-	led->encodedBuffer.draw(20,20);
-#endif
 	ofPopMatrix();
 }
 
@@ -180,43 +195,6 @@ void testApp::onIdle( ofxLibwebsockets::Event& args ){
 //--------------------------------------------------------------
 void testApp::onMessage( ofxLibwebsockets::Event& args ){
     cout<<"got message "<<args.message<<endl;
-	//    vector<string>sub = ofSplitString(args.message,",");
-	
-	//        if(sub.size()==3)
-	//        {
-	//            color.r = ofToInt(sub[0]);
-	//            color.g = ofToInt(sub[1]);
-	//            color.b = ofToInt(sub[2]);
-	//             printf("got color %i %i %i \n",color.r,color.g,color.b);
-	//             led->clear(color);
-	//        }
-    // trace out string messages or JSON messages!
-    if ( !args.json.isNull() ){
-        
-		ofLogVerbose("toStyledString") << args.json.toStyledString();
-        messages.push_back("New message: " + args.json.toStyledString() + " from " + args.conn.getClientName() );
-		colors.clear();
-		Json::Value v = args.json.get("colors", 0);
-		for(int i = 0 ; i < v.size() ;i++)
-		{
-			//			ofLogVerbose()<< v.get(i, 0).get("color",0).asInt();
-			
-			ofColor color;
-            color.r = v.get(i, 0).get("r",0).asInt();
-            color.g = v.get(i, 0).get("g",0).asInt();
-            color.b = v.get(i, 0).get("b",0).asInt();
-			
-			colors.push_back(color);
-			
-			
-		}
-    } else {
-        messages.push_back("New message: " + args.message + " from " + args.conn.getClientName() );
-		ofLogVerbose("PlainText") << args.message;
-    }
-	
-    // echo server = send message right back!
-    args.conn.send( args.message );
 }
 
 //--------------------------------------------------------------
@@ -244,7 +222,7 @@ void testApp::keyPressed(int key){
     }
     if(key==OF_KEY_RETURN)
     {
-;
+        ;
         
         toSend = ofToHex(myofColour.getHex());
         server.send( toSend.substr(2,string::npos-2) );
@@ -258,13 +236,13 @@ void testApp::keyReleased(int key){
 
 //--------------------------------------------------------------
 void testApp::mouseMoved(int x, int y ){
-    int _x = x*((float)spectum.getWidth()/(float)ofGetWidth());
-    int _y = y*((float)spectum.getHeight()/(float)ofGetHeight());
-    myofColour = spectum.getPixelsRef().getColor(_x,_y);
-    toSend = ofToHex(myofColour.getHex());
-    server.send( toSend.substr(2,string::npos-2) );
+    //    int _x = x*((float)spectum.getWidth()/(float)spectumRect.width);
+    //    int _y = y*((float)spectum.getHeight()/(float)spectumRect.height);
+    //    myofColour = spectum.getPixelsRef().getColor(_x,_y);
+    //    toSend = ofToHex(myofColour.getHex());
+    //    server.send( toSend.substr(2,string::npos-2) );
 	
-
+    
 }
 
 //--------------------------------------------------------------

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
-
+#include "ofxXmlSettings.h"
 #include "ofxLibwebsockets.h"
 
 #define NUM_MESSAGES 30 // how many past messages we want to keep
@@ -12,6 +12,7 @@
 #define row 1
 #define col 160
 #include "ofxDuration.h"
+
 class testApp : public ofBaseApp{
 
 	public:
@@ -28,7 +29,7 @@ class testApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
-		
+        void printClients();
         ofxLibwebsockets::Server server;
     
         bool bConnected;
@@ -52,9 +53,14 @@ class testApp : public ofBaseApp{
 	ofxLPD8806 spi;
 #endif
 	int numLED;
-	vector<ofColor> colors;
+//	vector<ofColor> colors;
     ofImage spectum;
+    ofRectangle spectumRect;
     ofColor myofColour;
+    ofColor myColor;
+    float myBrightness;
+    float mySaturation;
+
     
     //----------------------------------------------------
 	ofxDuration duration;
