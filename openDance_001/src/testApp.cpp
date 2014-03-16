@@ -16,14 +16,14 @@ void testApp::setup(){
 	ofSetLogLevel(OF_LOG_VERBOSE);
     // setup a server with default options on port 9092
     // - pass in true after port to set up with SSL
-    ofxXmlSettings xmlSettings("settings.xml");
-    if(xmlSettings.pushTag("XML"))
-    {
-        string xmlString;
-        xmlSettings.copyXmlToString(xmlString);
-        ofLogVerbose()<<xmlString;
-    }
-    
+//    ofxXmlSettings xmlSettings("settings.xml");
+//    if(xmlSettings.pushTag("XML"))
+//    {
+//        string xmlString;
+//        xmlSettings.copyXmlToString(xmlString);
+//        ofLogVerbose()<<xmlString;
+//    }
+//    
     
     ofxLibwebsockets::ServerOptions options = ofxLibwebsockets::defaultServerOptions();
     options.port = 2014;
@@ -83,18 +83,37 @@ void testApp::trackUpdated(ofxDurationEventArgs& args){
         if(args.track->name.find("brightness")!=string::npos)
         {
             myBrightness = args.track->value;
+            myColor.setHue(myHue);
+            myColor.setSaturation(mySaturation);
+            myColor.setBrightness(myBrightness);
+            toSend = ofToHex(myColor.getHex());
+            
+            server.send(toSend.substr(2,string::npos-2) );
 
         }
         if(args.track->name.find("saturate")!=string::npos)
         {
             mySaturation= args.track->value;
 
+            myColor.setHue(myHue);
+            myColor.setSaturation(mySaturation);
+            myColor.setBrightness(myBrightness);
+            toSend = ofToHex(myColor.getHex());
+            
+            server.send(toSend.substr(2,string::npos-2) );
 
         }
         if(args.track->name.find("color")!=string::npos)
         {
             myHue = args.track->color.getHue();
             //            ofLogVerbose()<<myColor;
+            myColor.setHue(myHue);
+            myColor.setSaturation(mySaturation);
+            myColor.setBrightness(myBrightness);
+            toSend = ofToHex(myColor.getHex());
+            
+            server.send(toSend.substr(2,string::npos-2) );
+
             
         }
         
@@ -114,12 +133,6 @@ void testApp::exit()
 //--------------------------------------------------------------
 void testApp::update(){
 
-    myColor.setHue(myHue);
-    myColor.setSaturation(mySaturation);
-    myColor.setBrightness(myBrightness);
-    toSend = ofToHex(myColor.getHex());
-    
-	server.send(toSend.substr(2,string::npos-2) );
 
 }
 
